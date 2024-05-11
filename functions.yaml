@@ -1,0 +1,63 @@
+functions:
+
+  dh_lake_map:
+    title: DH Lake Map
+    description: Gets top lake branches structure
+    params:
+      - type: object
+        title: Lake
+        alias: lake
+        required: true
+    code: >
+      (
+        $ctxG:= lake;
+        $config:= $ctxG."dochub.essentials.config";
+
+        $merge(
+          $map($distinct($config.key), function($v, $i, $a){(
+              $key_configs:= $config[$.key = $v];
+              $key_configs:= {$distinct($key_configs.key): $key_configs~>|$|{},["key"]|};
+              
+              $v = "$package"
+                  ? $key_configs~>|$eval("$." & "\"" & $v & "\"")|{"list": $spread($ctxG."$package")}|
+              
+            : $v = "imports"    
+                  ? ($count($key_configs.imports) > 1
+                      ? {$key_configs.$keys(): $merge($key_configs.imports)}
+                      : $key_configs)
+
+            : $v = "rules"
+                  ? ( $rules_list:= $ctxG.rules.validators.$spread($);
+                      $count($rules_list) > 0
+                            ? $key_configs~>|$eval("$." & $v)|{"list": $rules_list.{"rule": $keys($), "title": $.*.title, "description": $.*.description}}|
+                            : $key_configs)
+
+            : $v = "functions"
+                  ? ( $func_list:= $ctxG.functions.$spread($);
+                      $count($func_list) > 0
+                            ? $key_configs~>|$eval("$." & $v)|{"list": $func_list.{"function": $keys($), "title": $.*.title, "description": $.*.description}}|
+                            : $key_configs)
+
+            : $v = "docs"
+                  ? ( $docs_list:= $ctxG.docs.$spread($);
+                      $count($docs_list) > 0
+                            ? $key_configs~>|$eval("$." & $v)|{"list": $docs_list.{"doc": $keys($), "title": $.*.title, "description": $.*.description, "source": $.*.template ? $.*.template : $not($.*.type = "mkr-grid" or $.*.type = "smartants") ? $.*.source}}|
+                            : $key_configs)
+
+            : $v = "entities"
+                  ? ( $entities_list:= $ctxG.entities.$spread();$log($entities_list);
+                      $arch_entities_list:= $entities_list[$.*.objects and $not($.*.not_arch_entity = true)];
+                      $not_arch_entities_list:= $entities_list[$not($exists($.*.objects)) or $.*.not_arch_entity = true];
+                      $undefined_entities_list:= $ctxG.$keys()[$not($ in $entities_list.$keys()) and $not($ in $a)];
+                      $count($entities_list) > 0
+                            ? $key_configs~>|$eval("$." & $v)|{"list": { "arch_entities": $arch_entities_list.{"entity": $keys($), "title": $.*.title, "description": $.*.description},
+                                                                        "not_arch_entities": $not_arch_entities_list.{"entity": $keys($), "title": $.*.title, "description": $.*.description},
+                                                                        "undefined_entities": $undefined_entities_list.{"entity": $}}}|
+                            : $key_configs)
+
+            : {"undefined_configured_entity": $merge([{"entity": $key_configs.$keys()}, $key_configs.*])}
+        )}))     
+      )
+    result:
+      type: object
+      description: List of Packages, Manifests, Rules, functions, Docs, Arch and non-Arch Entities, Undefined entities
