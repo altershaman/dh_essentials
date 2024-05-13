@@ -1,0 +1,35 @@
+# Разметка озера DocHub
+
+dochub.essentials.config:
+
+  - key: $package
+    title: Пакеты
+    description: Обнаруженные заголовки пакетов archpkg
+
+  - key: imports #todo add not configured imports and checks that configured ones are in place
+    title: Подключенные манифесты
+    description: Размеченные импорты
+
+  - key: rules
+    title: Валидаторы
+    description: Применяемые валидаторы
+
+  - key: functions
+    title: Функции JSONata
+
+  - key: docs
+    title: Документы
+    description: Объявленные документы
+
+  - key: entities
+    title: Сущности
+
+  - key: dochub.essentials.config
+    title: Разметка DocHub Essentials
+    description: Разметка DocHub Essentials
+
+entities:
+  aspects:
+    not_arch_entity: true
+  contexts:
+    not_arch_entity: true

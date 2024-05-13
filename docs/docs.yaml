@@ -1,0 +1,366 @@
+docs:
+
+  dochub.essentials.docs.intro: #todo Добавить определение AaaC
+    location: Essentials/Intro
+    order: 100
+    description: DocHub Essentials Documentation Entry Point
+    type: markdown
+    source: intro.md
+
+  dochub.essentials.lake:
+    location: Essentials/SDK/Карта Озера (DH Lake Map)
+    order: 110
+    description: DocHub Lake Map
+    type: markdown
+    template: lake.md
+    source: >
+      (
+        $zero_keys:= $.$keys();
+
+        {"zero_keys": $zero_keys};
+
+        $lake:= $dh_lake_map($)
+      )
+
+  dochub.essentials.lake.packages:
+    location: ""
+    description: Packages Found
+    type: markdown
+    template: packages.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= $data.description;
+        $packages_list:= $data.list;
+        
+        { "description": $description,
+          "list": $map($packages_list, function($v){
+                    $merge([{"id": $v.$keys()}, $v.*])
+                  })
+        }
+      )
+
+  dochub.essentials.lake.imports:
+    location: ""
+    description: Imports Found
+    type: markdown
+    template: imports.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= $data.description;
+        $imports_list:= $data.list;
+        
+        { "description": $description,
+          "list":$imports_list
+        }
+      )
+
+  dochub.essentials.lake.rules:
+    location: ""
+    description: Rules Found
+    type: markdown
+    template: rules.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= $data.description;
+        $rules_list:= $data.list;
+        
+        { "description": $description,
+          "list":$rules_list
+        }
+      )
+
+  dochub.essentials.lake.docs:
+    location: ""
+    description: Docs Found
+    type: markdown
+    template: docs.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= $data.description;
+        $docs_list:= $data.list;
+        
+        { "description": $description,
+          "list":$docs_list
+        }
+      )
+
+  dochub.essentials.lake.functions:
+    location: ""
+    description: Docs Found
+    type: markdown
+    template: functions.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= $data.description;
+        $functions_list:= $data.list;
+        
+        { "description": $description,
+          "list":$functions_list
+        }
+      )
+
+  dochub.essentials.lake.arch_entities:
+    location: ""
+    description: Перечень архитектурных сущностей
+    type: markdown
+    template: arch_entities.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= "Архитектурные сущности";
+        $arch_entities_list:= $data;
+        
+        { "description": $description,
+          "list":$arch_entities_list
+        }
+      )
+
+  dochub.essentials.lake.not_arch_entities:
+    location: ""
+    description: Перечень НЕ архитектурных сущностей
+    type: markdown
+    template: not_arch_entities.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= "Не архитектурные сущности";
+        $not_arch_entities_list:= $data;
+        
+        { "description": $description,
+          "list":$not_arch_entities_list
+        }
+      )
+
+  dochub.essentials.lake.undefined_configured_entities:
+    location: ""
+    description: Слабо определенные сущности
+    type: markdown
+    template: undefined_configured_entities.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= "Слабо определенные сущности";
+        $undefined_configured_entities_list:= $data;
+        
+        { "description": $description,
+          "list":$undefined_configured_entities_list
+        }
+      )
+
+  dochub.essentials.lake.undefined_entities:
+    location: ""
+    description: Слабо определенные сущности
+    type: markdown
+    template: undefined_entities.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= "Слабо определенные сущности";
+        $undefined_entities_list:= $data;
+        
+        { "description": $description,
+          "list":$undefined_entities_list
+        }
+      )
+
+  dochub.essentials.lake.map: #todo add explained sections
+    location: ""
+    description: DH Lake Map Grid
+    type: mkr-grid
+    source: >
+      (
+
+        $lake:= $dh_lake_map($);
+
+        $packages:= $lake."$package";
+        $packages_data:= $encodeUrl($string($packages));
+
+        $imports:= $lake.imports;
+        $imports_data:= $encodeUrl($string($imports));
+
+        $rules:= $lake.rules;
+        $rules_data:= $encodeUrl($string($rules));
+
+        $docs:= $lake.docs;
+        $docs_data:= $encodeUrl($string($docs));
+
+        $functions:= $lake.functions;
+        $functions_data:= $encodeUrl($string($functions));
+        
+        $arch_entities:= $lake.entities.list.arch_entities;
+        $arch_entities_data:= $encodeUrl($string($arch_entities));
+
+        $not_arch_entities:= $lake.entities.list.not_arch_entities;
+        $not_arch_entities_data:= $encodeUrl($string($not_arch_entities));
+
+        $undefined_entities:= [$lake.entities.list.undefined_entities];
+        $undefined_entities_data:= $encodeUrl($string($undefined_entities));
+
+        $undefined_configured_entities:= [$lake.undefined_configured_entity];
+        $undefined_configured_entities_data:= $encodeUrl($string($undefined_configured_entities));
+
+
+        { "type": "rows",
+          "items": [
+            {"type": "columns",
+             "items": [
+              { "title": $packages.title,
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.packages?data=" & $packages_data
+              },
+              { "title": $imports.title,
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.imports?data=" & $imports_data
+              }
+              ]},
+
+            {"type": "columns",
+             "items": [
+              { "title": $rules.title,
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.rules?data=" & $rules_data
+              },
+              { "title": $functions.title,
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.functions?data=" & $functions_data
+              }
+              ]},
+
+            {"type": "columns",
+             "items": [
+
+              { "title": $docs.title,
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.docs?data=" & $docs_data
+              },
+              { "title": "Архитектектурные сущности",
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.arch_entities?data=" & $arch_entities_data
+              }
+              ]},
+
+            {"type": "columns",
+             "items": [
+
+              { "title": "Не архитектектурные сущности",
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.not_arch_entities?data=" & $not_arch_entities_data
+              },
+              { "title": "Слабо определенные сущности",
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.undefined_configured_entities?data=" & $undefined_configured_entities_data
+              }
+            ]},
+
+            {"type": "columns",
+             "items": [
+
+              { "title": "Не определенные сущности",
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.undefined_entities?data=" & $undefined_entities_data
+              }
+
+
+             ]
+            }
+
+          ]
+        }
+      )
+
+  dochub.essentials.sdk:
+    location: Essentials/SDK
+    description: # todo описание документа
+    type: markdown
+    source: sdk.md
+
+  dochub.essentials.docs.roadmap:
+    location: Essentials/Roadmap
+    description: DocHub Essentials Roadmap
+    type: markdown
+    source: roadmap.md
+
+  dochub.essentials.docs.jsonata.context:
+    location: Essentials/JSONata/context
+    order: 600
+    description: JSONata context
+    type: markdown
+    source: jsonata/context.md
+
+# Manifest meta
+
+dochub.essentials.config:
+  - key: imports
+    list:
+      - manifest: docs/docs.yaml
+        title: DocHub Essentials Documentation
+      - manifest: config.yaml
+        title: Основная конфигурация озера
