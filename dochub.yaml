@@ -2,3 +2,4 @@ imports:
   - docs/docs.yaml
   - config.yaml
   - functions.yaml
+  - icons.yaml

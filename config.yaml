@@ -28,6 +28,11 @@ dochub.essentials.config:
     title: Разметка DocHub Essentials
     description: Разметка DocHub Essentials
 
+  - key: icons
+    title: Icon Sets
+    list:
+      - dochub.essentials.icons
+
 entities:
   aspects:
     not_arch_entity: true

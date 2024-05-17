@@ -44,6 +44,11 @@ functions:
                             ? $key_configs~>|$eval("$." & $v)|{"list": $docs_list.{"doc": $keys($), "title": $.*.title, "description": $.*.description, "source": $.*.template ? $.*.template : $not($.*.type = "mkr-grid" or $.*.type = "smartants") ? $.*.source}}|
                             : $key_configs)
 
+            : $v = "icons"
+                  ? ($count($key_configs.icons) > 1
+                            ? {$key_configs.$keys(): $merge(($key_configs~>|$.icons|{"list":$key_configs.icons.list}|).icons)}
+                            : $key_configs)
+
             : $v = "entities"
                   ? ( $entities_list:= $ctxG.entities.$spread();$log($entities_list);
                       $arch_entities_list:= $entities_list[$.*.objects and $not($.*.not_arch_entity = true)];
@@ -61,3 +66,81 @@ functions:
     result:
       type: object
       description: List of Packages, Manifests, Rules, functions, Docs, Arch and non-Arch Entities, Undefined entities
+
+  getSymbol_t1:
+    title: Сформировать svg-символы для SmartAnts
+    params:
+      - type: string
+        title: Main title
+        alias: title
+        required: true
+      - type: string
+        title: Entity id
+        alias: entity_id
+        required: true
+      - type: number
+        title: Symbol width in pixels
+        alias: symbol_width
+        required: true
+      - type: object
+        title: Шаблоны иконок
+        alias: icons
+        required: true
+    code: >
+      (
+        $title:= title; $entity_id:= entity_id; $symbol_width:= symbol_width; $icons:= icons;
+        
+        $symbol_title:= $split($entity_id, ".")[-1];
+        $symbol_obj:= $eval("$icons." & $symbol_title);
+        $symbol_gliph:= $symbol_obj.gliph;
+        $symbol_template:= $symbol_gliph ?
+          $match($symbol_gliph, /^(<svg)[^>]+>/, 1).match &
+          '<rect x="0" y="-960" width={{vbWidth}} height="960" rx="300" fill="' & $symbol_obj.back_color & '"/>' &
+          '<text style="font-size:800px;" x="1200" y="-250" fill="' & $symbol_obj.fore_color & '" font-family="monospace">{{title}}</text>' &
+          $match($symbol_gliph, /(<path)[^>]+>/, 1).match &
+          '</svg>'
+        ;
+        $symbol_template:= $symbol_template
+            ? $symbol_template
+            : $icons.no_icon;
+        $symbol_svg:= $replace($symbol_template, /\{\{title\}\}/, $title); 
+        $symbol_svg:= $replace($symbol_svg, /\{\{fore_color\}\}/, $symbol_obj.fore_color);
+        $symbol_svg:= $replace($symbol_svg, /\{\{back_color\}\}/, $symbol_obj.back_color);
+        $symbol_svg:= $replace($symbol_svg, /\{\{absWidth\}\}/, $string($symbol_width)); 
+        $symbol_svg:= $replace($symbol_svg, /\{\{vbWidth\}\}/, $string(4000*$symbol_width/100)); 
+
+        {"title": $symbol_title & "_" & $title, "svg": $symbol_svg}
+      )
+    result:
+      type: object
+
+  getIcons:
+    title: Получить набор иконок
+    params:
+      - type: array
+        title: Icon Sets List
+        alias: icon_sets_list
+        required: true
+      - type: object
+        title: Context
+        alias: ctx
+        required: true
+    code: >
+      (
+        $icon_sets_list:= icon_sets_list; $ctx:= ctx;
+        
+        $icons:= function($sets, $icons_obj, $i) {(
+          $set:= $eval("$ctx." & "\"" & $sets[$i] & "\"");
+          $icons_obj:= $merge([$icons_obj, $set]);
+          $i<$count($sets)-1
+            ? $icons($sets, $icons_obj, $i+1)
+            : $icons_obj
+        )};
+
+        $icons_list:= $count($icon_sets_list) > 0
+          ? $icons($icon_sets_list, {}, 0)
+          : {}
+      )
+    result:
+      type: object
+

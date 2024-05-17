@@ -169,11 +169,28 @@ docs:
       (
         $data:= $params.data; $data:= $eval($decodeUrl($data));
 
-        $description:= "Слабо определенные сущности";
+        $description:= "Не определенные сущности";
         $undefined_entities_list:= $data;
         
         { "description": $description,
           "list":$undefined_entities_list
+        }
+      )
+
+  dochub.essentials.lake.icon_sets:
+    location: ""
+    description: Слабо определенные сущности
+    type: markdown
+    template: icon_sets.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= "Наборы иконок";
+        $icon_sets_list:= $data;
+        
+        { "description": $description,
+          "list":$icon_sets_list
         }
       )
 
@@ -212,6 +229,9 @@ docs:
 
         $undefined_configured_entities:= [$lake.undefined_configured_entity];
         $undefined_configured_entities_data:= $encodeUrl($string($undefined_configured_entities));
+
+        $icon_sets:= $lake.icons and $count($lake.icons.list) >0 ? $lake.icons.list : [];
+        $icon_sets_data:= $encodeUrl($string($icon_sets));
 
 
         { "type": "rows",
@@ -326,7 +346,18 @@ docs:
                       "margin": "4px"
                   },
                   "src": "@document/dochub.essentials.lake.undefined_entities?data=" & $undefined_entities_data
+              },
+              { "title": "Иконки",
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.icon_sets?data=" & $icon_sets_data
               }
+
 
 
              ]
