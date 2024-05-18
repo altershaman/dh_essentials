@@ -13,14 +13,6 @@ docs:
     description: DocHub Lake Map
     type: markdown
     template: lake.md
-    source: >
-      (
-        $zero_keys:= $.$keys();
-
-        {"zero_keys": $zero_keys};
-
-        $lake:= $dh_lake_map($)
-      )
 
   dochub.essentials.lake.packages:
     location: ""
@@ -366,6 +358,75 @@ docs:
           ]
         }
       )
+
+  dochub.essentials.domains:
+    location:  Essentials/SDK/Карта доменов
+    order: 120
+    description: Arch Entities Objects Domain Map (graph wrapper)
+    type: markdown
+    template: domains.md
+    source: >
+      (
+        $arch_entities_id:= [$dh_lake_map($).entities.list.arch_entities.entity];
+        $arch_objects:= $dh_ctx_objects($arch_entities_id, $);
+
+        $data:= $encodeUrl($string($arch_objects));
+
+        {"is_not_empty": ($count($arch_objects.$keys()) > 0
+                            ? true
+                            : false),
+          "data": $data
+        }        
+      )
+
+  dochub.essentials.domains.graph:
+    location: ""
+    order: 120
+    description: Arch Entities Objects Domain Map (graph)
+    type: smartants
+    source: >
+      (
+        $data:= $eval($decodeUrl($params.data));
+        $data:= $map($spread($data), function($v){
+                    $map($spread($v.*), function($vv){
+                      { "object_id": $vv.$keys(),
+                        "object_title": $vv.*.title,
+                        "entity_id": $v.$keys(),
+                        "entity_title": $lookup($.entities, $v.$keys()).title
+                      }
+                    })
+                });
+        $data:= $reduce($data, $append);
+
+        $icons:= $getIcons($dh_lake_map($).icons.list, $);
+
+        $pre_nodes:= $data.$map($, function($v) {(
+            $title:= $split($.object_id, ".")[-1];
+            $size:= $length($title);
+            $symbol_width:= 25 + ($size > 7 ? $size*14 : $size*16 );
+            $symbol:= $getSymbol_t1($title, $.entity_id, $symbol_width, $icons);
+            {"nodes": {
+                $.object_id: {
+                    "title": $title, 
+                    "symbol": $symbol.title}
+                },
+            "symbols": {
+                $symbol.title: $symbol.svg}
+            };
+        )});
+
+        {"config": {
+          "distance": 10,
+          "trackWidth": 24,
+          "hideLeafTitles": true
+          },
+          "symbols": $merge($pre_nodes.symbols), 
+          "nodes": $merge($pre_nodes.nodes)
+        } 
+
+
+      )
+
 
   dochub.essentials.sdk:
     location: Essentials/SDK

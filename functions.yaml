@@ -1,5 +1,29 @@
 functions:
 
+  dh_ctx_objects:
+    title: DH context's objects
+    description: Gets objects by entities list from given context
+    params:
+      - type: array
+        title: Entities list
+        alias: entities_list
+        required: true
+      - type: object
+        title: Context
+        alias: ctx
+        required: true
+    code: >
+      (
+        $entities_list:= entities_list; $ctx:= ctx;
+
+        $merge($map($entities_list, function($v){(
+            $objects:= $eval("$ctx." & "\"" & $v & "\"");
+            $count($objects.$keys()) > 0
+                ? {$v: $objects}
+        )}))
+        
+      )
+
   dh_lake_map:
     title: DH Lake Map
     description: Gets top lake branches structure
@@ -50,7 +74,7 @@ functions:
                             : $key_configs)
 
             : $v = "entities"
-                  ? ( $entities_list:= $ctxG.entities.$spread();$log($entities_list);
+                  ? ( $entities_list:= $ctxG.entities.$spread();
                       $arch_entities_list:= $entities_list[$.*.objects and $not($.*.not_arch_entity = true)];
                       $not_arch_entities_list:= $entities_list[$not($exists($.*.objects)) or $.*.not_arch_entity = true];
                       $undefined_entities_list:= $ctxG.$keys()[$not($ in $entities_list.$keys()) and $not($ in $a)];
