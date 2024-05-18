@@ -185,6 +185,24 @@ docs:
           "list":$icon_sets_list
         }
       )
+  
+  dochub.essentials.lake.ddd_contexts:
+    location: ""
+    description: DDD контексты
+    type: markdown
+    template: ddd_contexts.md
+    source: >
+      (
+        $data:= $params.data; $data:= $eval($decodeUrl($data));
+
+        $description:= $data.title;
+        $ddd_contexts_list:= $data.list;
+        
+        { "description": $description,
+          "list":$ddd_contexts_list
+        }
+      )
+
 
   dochub.essentials.lake.map: #todo add explained sections
     location: ""
@@ -224,6 +242,10 @@ docs:
 
         $icon_sets:= $lake.icons and $count($lake.icons.list) >0 ? $lake.icons.list : [];
         $icon_sets_data:= $encodeUrl($string($icon_sets));
+
+        $ddd_contexts:= $lake.ddd_contexts and $count($lake.ddd_contexts.list) >0 ? $lake.ddd_contexts : [];
+        $ddd_contexts_data:= $encodeUrl($string($ddd_contexts));
+
 
 
         { "type": "rows",
@@ -349,12 +371,23 @@ docs:
                   },
                   "src": "@document/dochub.essentials.lake.icon_sets?data=" & $icon_sets_data
               }
+             ]
+            },
+            {"type": "columns",
+             "items": [
 
-
-
+              { "title": "DDD контексты",
+                "icon": "add_box",
+                  "style": {
+                      "border": true,
+                      "padding": "12px",
+                      "max-width": "100%",
+                      "margin": "4px"
+                  },
+                  "src": "@document/dochub.essentials.lake.ddd_contexts?data=" & $ddd_contexts_data
+              }
              ]
             }
-
           ]
         }
       )
@@ -426,7 +459,6 @@ docs:
 
 
       )
-
 
   dochub.essentials.sdk:
     location: Essentials/SDK

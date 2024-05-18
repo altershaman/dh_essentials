@@ -33,6 +33,12 @@ dochub.essentials.config:
     list:
       - dochub.essentials.icons
 
+  # - key: ddd_contexts
+  #   title: DDD контексты
+  #   list:
+  #     - flix
+  #     - flix.team
+
 entities:
   aspects:
     not_arch_entity: true

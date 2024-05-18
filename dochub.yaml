@@ -3,3 +3,4 @@ imports:
   - config.yaml
   - functions.yaml
   - icons.yaml
+  - entities.yaml
